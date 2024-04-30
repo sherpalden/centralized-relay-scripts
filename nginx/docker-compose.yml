@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  archway:
+    container_name: archway-node
+    image: ghcr.io/archway-network/archwayd-dev:v5.0.0
+    entrypoint:
+      - sh
+      - /opt/localnet.sh
+    ports:
+      - 9090:9090
+      - 26657:26657
+      - 26656:26656
+    volumes:
+      - /Users/sherpalden/blockchain/chains/archway/scripts:/opt:z
+      - /Users/sherpalden/blockchain/chains/archway/contracts:/contracts:z
+    working_dir: /opt
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    ports:
+      - 443:443
+      - 80:80
+      - 9445:445

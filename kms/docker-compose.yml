@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  kms:
+    image: nsmithuk/local-kms
+    volumes:
+      - ./data:/data
+      - ./init:/init
+    ports:
+      - 4599:8080

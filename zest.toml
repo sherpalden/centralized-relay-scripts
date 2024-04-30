@@ -1,0 +1,18 @@
+[addresses]
+  sui_rlp = '0x0'
+
+[dependencies]
+  [dependencies.Sui]
+    git = 'https://github.com/MystenLabs/sui.git'
+    rev = 'framework/testnet'
+    subdir = 'crates/sui-framework/packages/sui-framework'
+
+[dev-addresses]
+
+[dev-dependencies]
+
+[package]
+  edition = '2024.alpha'
+  name = 'sui_rlp'
+  published = '0x9'
+  published-at = '0x0'
