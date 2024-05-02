@@ -5,10 +5,12 @@ source utils.sh
 
 SUI_GAS_BUDGET=50000000
 
-XCALL_PATH=./repos/xcall-multi/contracts/sui/xcall
-RLP_PATH=./repos/xcall-multi/contracts/sui/libs/sui_rlp
-MOCK_DAPP_PATH=./repos/xcall-multi/contracts/sui/mock_dapp
+GAS_COIN_ID=0x3789f3310cd2c556dedd2487d620debc640756cdb36e86dc9ab8d672f85487fd
+GAS_COIN_ID_1=0xdef77b35bb80e3b60465ce919dec3bef53d16bda76c65d9a1ffd120b3affd35e
 
+XCALL_PATH=$PWD/repos/xcall-multi/contracts/sui/xcall
+RLP_PATH=$PWD/repos/xcall-multi/contracts/sui/libs/sui_rlp
+MOCK_DAPP_PATH=$PWD/repos/xcall-multi/contracts/sui/mock_dapp
 
 function init() {
     cd ./repos
@@ -43,11 +45,12 @@ function deploy_rlp() {
 function deploy_xcall() {
     file_path=$XCALL_PATH/MOVE.toml
     update_file $file_path package.published-at 0x0
-    update_file $file_path addresses.sui_rlp 0x0
+    update_file $file_path addresses.xcall 0x0
 
     sui move build --path $XCALL_PATH
 
-    result=$(sui client publish --gas-budget $SUI_GAS_BUDGET $XCALL_PATH --json) || handle_error "failed to publish package xcall"
+    result=$(sui client publish --gas-budget $SUI_GAS_BUDGET $XCALL_PATH --json) || handle_error "failed to publish package rlp"
+    echo "Result: $result"
     package_id=$(echo $result | jq -r '.objectChanges[] | select(.type == "published") | .packageId')
 
     object_type=$package_id::xcall_state::AdminCap
@@ -92,30 +95,30 @@ function deploy_dapp() {
 }
 
 function register_connection() {
-    xcall_pkg_id=0x23a771b121e17f4ac29e801127f80d7115b97ca1e056faf844af0c8cb535bd7f
-    xcall_storage=0xc8f8dfe3d5528b722b4184f18208d4a6b7ad1d0903cafc4bdc29b57690c704b8
-    xcall_admin_cap=0x31faf9958abbd7030d7d893e499e43f5ffa1ce461897e4c26cc912d9ffbbba30
+    xcall_pkg_id=$(cat $(getPath SUI .xcall))
+    xcall_storage=$(cat $(getPath SUI .xcallStorage))
+    xcall_admin_cap=$(cat $(getPath SUI .xcallAdminCap))
     echo $(sui client call \
         --package $xcall_pkg_id \
         --module main \
         --function register_connection \
         --args $xcall_storage $xcall_admin_cap sui centralized \
-        --gas 0x3789f3310cd2c556dedd2487d620debc640756cdb36e86dc9ab8d672f85487fd \
-        --gas-budget 50000000 \
+        --gas $GAS_COIN_ID \
+        --gas-budget $SUI_GAS_BUDGET \
         --json)
 }
 
 function register_xcall() {
-    dapp_pkg_id=0x6534a987c20ead36a454ca500f2ec1578c010f99998e255f5d3f60455bd597d7
-    xcall_storage=0xc8f8dfe3d5528b722b4184f18208d4a6b7ad1d0903cafc4bdc29b57690c704b8
-    dapp_witness_carrier=0x270f69e8fe12a4d25c93a00e412b16cb1236a6d0a166b65951dc004c9d9e5399
+    dapp_pkg_id=$(cat $(getPath SUI .dapp))
+    xcall_storage=$(cat $(getPath SUI .xcallStorage))
+    dapp_witness_carrier=$(cat $(getPath SUI .dappWitnessCarrier))
     result=$(sui client call \
         --package $dapp_pkg_id \
         --module mock_dapp \
         --function register_xcall \
         --args $xcall_storage $dapp_witness_carrier \
-        --gas 0x3789f3310cd2c556dedd2487d620debc640756cdb36e86dc9ab8d672f85487fd \
-        --gas-budget 50000000 \
+        --gas $GAS_COIN_ID \
+        --gas-budget $SUI_GAS_BUDGET \
         --json) || handle_error "failed to register xcall on dapp"
 
     object_type="${dapp_pkg_id}::dapp_state::DappState"
@@ -125,18 +128,37 @@ function register_xcall() {
     log "parsed dapp state : $dapp_state"
 }
 
+function add_connection() {
+    dest_chain=$1
+    dest_nid=$(get ${dest_chain}_NETWORK_ID)
+    dest_connection_addr=$(cat $(getPath $dest_chain .centralizedConnection))
+
+    dapp_pkg_id=$(cat $(getPath SUI .dapp))
+    dapp_state=$(cat $(getPath SUI .dappState))
+
+    tx="sui client call \
+        --package $dapp_pkg_id \
+        --module mock_dapp \
+        --function add_connection \
+        --args $dapp_state $dest_nid centralized $dest_connection_addr \
+        --gas $GAS_COIN_ID \
+        --gas-budget $SUI_GAS_BUDGET \
+        --json"
+
+    echo $($tx)
+}
+
 function send_message() {
-    dapp_pkg_id=0x6534a987c20ead36a454ca500f2ec1578c010f99998e255f5d3f60455bd597d7
-    xcall_storage=0xc8f8dfe3d5528b722b4184f18208d4a6b7ad1d0903cafc4bdc29b57690c704b8
-    dapp_state=0xcce001c26a92463496577406aca3d8cbd73f40ea289da5d25fde0935baa69b9e
-    gas_obj_id=0x3789f3310cd2c556dedd2487d620debc640756cdb36e86dc9ab8d672f85487fd
+    dapp_pkg_id=$(cat $(getPath SUI .dapp))
+    xcall_storage=$(cat $(getPath SUI .xcallStorage))
+    dapp_state=$(cat $(getPath SUI .dappState))
     echo $(sui client call \
         --package $dapp_pkg_id \
         --module mock_dapp \
         --function send_message \
-        --args $dapp_state $xcall_storage $gas_obj_id 0x3.icon '[104,101,108,108,111]' \
-        --gas $gas_obj_id\
-        --gas-budget 50000000 \
+        --args $dapp_state $xcall_storage $GAS_COIN_ID_1 0x3.icon/abc '[104,101,108,108,111]' \
+        --gas $GAS_COIN_ID \
+        --gas-budget $SUI_GAS_BUDGET \
         --json)
 }
 
@@ -173,7 +195,10 @@ case "$1" in
 			;;
         esac
     ;;
-	send_message)
+	add_connection)
+		add_connection $2
+	;;
+    send_message)
 		send_message $2
 	;;
     *)

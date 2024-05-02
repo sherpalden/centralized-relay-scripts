@@ -64,10 +64,8 @@ export ARCHWAY_COMMON_ARGS_V1=" --keyring-backend $WASM_KEYRING_BACKEND --node $
 ##############################    SUI    ###################################
 export SUI_NODE_URI=https://fullnode.testnet.sui.io:443
 export SUI_NODE_WS_URI=ws://fullnode.testnet.sui.io:443
-export SUI_CHAIN_ID=sui.testnet
-export SUI_RELAYER_ADDRESS=0xf873904af2aa7fbd0c3d607bf49a679c9c67dd85625667cb461b3edf4e97fc4d
-export SUI_PACKAGE_ID=0x65ac3137937ba87148ce88b9e6dbe33d17bd1ab59881171d11836a8897a396be
-export SUI_GAS_BUDGET=50000000
+export SUI_CHAIN_ID=sui
+export SUI_RELAYER_ADDRESS=0x07304a5d7d1a4763a1cea91f478d24e40aecf1fdbd2f14764d5ad745f4904f85
 
 
 ##############################    ICON    ###################################

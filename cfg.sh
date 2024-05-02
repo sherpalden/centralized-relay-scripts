@@ -6,6 +6,10 @@ source utils.sh
 RELAY_CFG_FILE=$HOME/.centralized-relay/config.yaml
 RELAY_CFG_BACKUP_FILE=$HOME/.centralized-relay/config_backup.yaml
 
+
+sui_xcall_address=$(cat $(getPath SUI .xcall)) || handle_error "failed to get sui xcall address"
+sui_dapp_address=$(cat $(getPath SUI .dapp)) || handle_error "failed to get sui dapp address"
+
 icon_xcall_address=$(cat $(getPath ICON .xcall)) || handle_error "failed to get icon xcall address"
 avalanche_xcall_address=$(cat $(getPath AVALANCHE .xcall)) || handle_error "failed to get avalanche xcall address"
 archway_xcall_address=$(cat $(getPath ARCHWAY .xcall)) || handle_error "failed to get archway xcall address"
@@ -25,17 +29,18 @@ rm $RELAY_CFG_FILE
 cat <<EOF >> $RELAY_CFG_FILE
 global:
   timeout: 10s
-  kms-key-id: 59bdce7a-c725-4c54-bcc8-5b011de0b75d
+  kms-key-id: 
 chains:
-  # sui:
-  #   type: sui
-  #   value:
-  #     chain-id: $SUI_CHAIN_ID
-  #     nid: $SUI_CHAIN_ID
-  #     rpc-url: $SUI_NODE_URI
-  #     ws-url: $SUI_NODE_WS_URI
-  #     address: $SUI_RELAYER_ADDRESS
-  #     package-id: $SUI_PACKAGE_ID
+  sui:
+    type: sui
+    value:
+      chain-id: sui
+      nid: sui
+      rpc-url: $SUI_NODE_URI
+      ws-url: $SUI_NODE_WS_URI
+      address: $SUI_RELAYER_ADDRESS
+      xcall-package-id: $sui_xcall_address
+      dapp-package-id: $sui_dapp_address
 
   avalanche:
     type: evm
@@ -72,44 +77,44 @@ chains:
   #       block-interval: 400ms
   #       nid: 0xe9ac0ce.neon
 
-  icon:
-    type: icon
-    value:
-      rpc-url: $ICON_NODE_URI
-      start-height: 0
-      address: $icon_relayer_address
-      contracts:
-        xcall: $icon_xcall_address
-        connection: $icon_connection_address
-      network-id: $ICON_NID
-      nid: $ICON_NETWORK_ID
-      step-min: 1
-      step-limit: 100000000000
-  archway:
-    type: cosmos
-    value:
-      chain-id: $ARCHWAY_CHAIN_ID
-      nid: $ARCHWAY_NETWORK_ID
-      rpc-url: $ARCHWAY_NODE_URI
-      grpc-url: $ARCHWAY_NODE_GRPC_URI
-      keyring-backend: memory
-      address: $archway_relayer
-      account-prefix: $ARCHWAY_PREFIX
-      start-height: 0
-      contracts:
-        xcall: $archway_xcall_address
-        connection: $archway_connection_address
-      denomination: $ARCHWAY_DENOM
-      gas-prices: $ARCHWAY_GAS_PRICE$ARCHWAY_DENOM
-      gas-adjustment: 1.5
-      max-gas-amount: 4000000
-      min-gas-amount: 20000
-      block-interval: 6s
-      tx-confirmation-interval: 5s
-      broadcast-mode: sync
-      sign-mode: SIGN_MODE_DIRECT
-      simulate: true
-      finality-block: 0
+  # icon:
+  #   type: icon
+  #   value:
+  #     rpc-url: $ICON_NODE_URI
+  #     start-height: 0
+  #     address: $icon_relayer_address
+  #     contracts:
+  #       xcall: $icon_xcall_address
+  #       connection: $icon_connection_address
+  #     network-id: $ICON_NID
+  #     nid: $ICON_NETWORK_ID
+  #     step-min: 1
+  #     step-limit: 100000000000
+  # archway:
+  #   type: cosmos
+  #   value:
+  #     chain-id: $ARCHWAY_CHAIN_ID
+  #     nid: $ARCHWAY_NETWORK_ID
+  #     rpc-url: $ARCHWAY_NODE_URI
+  #     grpc-url: $ARCHWAY_NODE_GRPC_URI
+  #     keyring-backend: memory
+  #     address: $archway_relayer
+  #     account-prefix: $ARCHWAY_PREFIX
+  #     start-height: 0
+  #     contracts:
+  #       xcall: $archway_xcall_address
+  #       connection: $archway_connection_address
+  #     denomination: $ARCHWAY_DENOM
+  #     gas-prices: $ARCHWAY_GAS_PRICE$ARCHWAY_DENOM
+  #     gas-adjustment: 1.5
+  #     max-gas-amount: 4000000
+  #     min-gas-amount: 20000
+  #     block-interval: 6s
+  #     tx-confirmation-interval: 5s
+  #     broadcast-mode: sync
+  #     sign-mode: SIGN_MODE_DIRECT
+  #     simulate: true
+  #     finality-block: 0
 EOF
 
 log "relay config updated!"
