@@ -10,6 +10,9 @@ RELAY_CFG_BACKUP_FILE=$HOME/.centralized-relay/config_backup.yaml
 sui_xcall_address=$(cat $(getPath SUI .xcall)) || handle_error "failed to get sui xcall address"
 sui_dapp_address=$(cat $(getPath SUI .dapp)) || handle_error "failed to get sui dapp address"
 
+sui_xcall_storage_id=$(cat $(getPath SUI .xcallStorage)) || handle_error "failed to get sui xcall storage address"
+sui_dapp_state_id=$(cat $(getPath SUI .dappState)) || handle_error "failed to get sui dapp state address"
+
 icon_xcall_address=$(cat $(getPath ICON .xcall)) || handle_error "failed to get icon xcall address"
 avalanche_xcall_address=$(cat $(getPath AVALANCHE .xcall)) || handle_error "failed to get avalanche xcall address"
 archway_xcall_address=$(cat $(getPath ARCHWAY .xcall)) || handle_error "failed to get archway xcall address"
@@ -29,7 +32,7 @@ rm $RELAY_CFG_FILE
 cat <<EOF >> $RELAY_CFG_FILE
 global:
   timeout: 10s
-  kms-key-id: 
+  kms-key-id: 5b52e346-0caf-4373-baa4-98b138e081b1
 chains:
   sui:
     type: sui
@@ -41,22 +44,26 @@ chains:
       address: $SUI_RELAYER_ADDRESS
       xcall-package-id: $sui_xcall_address
       dapp-package-id: $sui_dapp_address
+      xcall-storage-id: $sui_xcall_storage_id
+      dapp-state-id: $sui_dapp_state_id
+      gas-limit: 5000000
+      gas-min: 5000000
 
-  avalanche:
-    type: evm
-    value:
-      rpc-url: $AVALANCHE_NODE_URI
-      websocket-url: wss://neon-evm-devnet.drpc.org
-      start-height: 0
-      address: $evm_relayer_address
-      gas-price: $EVM_GAS_PRICE
-      gas-limit: $EVM_GAS_LIMIT
-      contracts:
-        xcall: $avalanche_xcall_address
-        connection: $avalanche_connection_address
-      nid: $AVALANCHE_NETWORK_ID
-      finality-block: 10
-      block-interval: 2s
+  # avalanche:
+  #   type: evm
+  #   value:
+  #     rpc-url: $AVALANCHE_NODE_URI
+  #     websocket-url: wss://neon-evm-devnet.drpc.org
+  #     start-height: 0
+  #     address: $evm_relayer_address
+  #     gas-price: $EVM_GAS_PRICE
+  #     gas-limit: $EVM_GAS_LIMIT
+  #     contracts:
+  #       xcall: $avalanche_xcall_address
+  #       connection: $avalanche_connection_address
+  #     nid: $AVALANCHE_NETWORK_ID
+  #     finality-block: 10
+  #     block-interval: 2s
 
   # neon:
   #   type: evm
@@ -77,19 +84,19 @@ chains:
   #       block-interval: 400ms
   #       nid: 0xe9ac0ce.neon
 
-  # icon:
-  #   type: icon
-  #   value:
-  #     rpc-url: $ICON_NODE_URI
-  #     start-height: 0
-  #     address: $icon_relayer_address
-  #     contracts:
-  #       xcall: $icon_xcall_address
-  #       connection: $icon_connection_address
-  #     network-id: $ICON_NID
-  #     nid: $ICON_NETWORK_ID
-  #     step-min: 1
-  #     step-limit: 100000000000
+  icon:
+    type: icon
+    value:
+      rpc-url: $ICON_NODE_URI
+      start-height: 0
+      address: $icon_relayer_address
+      contracts:
+        xcall: $icon_xcall_address
+        connection: $icon_connection_address
+      network-id: $ICON_NID
+      nid: $ICON_NETWORK_ID
+      step-min: 1
+      step-limit: 100000000000
   # archway:
   #   type: cosmos
   #   value:

@@ -64,6 +64,8 @@ export ARCHWAY_COMMON_ARGS_V1=" --keyring-backend $WASM_KEYRING_BACKEND --node $
 ##############################    SUI    ###################################
 export SUI_NODE_URI=https://fullnode.testnet.sui.io:443
 export SUI_NODE_WS_URI=ws://fullnode.testnet.sui.io:443
+# export SUI_NODE_URI=http://localhost:9000
+# export SUI_NODE_WS_URI=ws://localhost:9000
 export SUI_CHAIN_ID=sui
 export SUI_RELAYER_ADDRESS=0x07304a5d7d1a4763a1cea91f478d24e40aecf1fdbd2f14764d5ad745f4904f85
 
@@ -94,8 +96,8 @@ export CW_XCALL=$PWD/artifacts/cw_xcall.wasm
 export CW_CENTRALIZED_CONNECTION=$PWD/artifacts/cw_centralized_connection.wasm
 
 ---------------------------------------------------------------------------------
-export JS_XCALL=$HOME/blockchain/projects/scripts/ibc-relay/artifacts/xcall.jar
-# export JS_XCALL=$XCALL_MULTI/contracts/javascore/xcall/build/libs/xcall-0.1.0-optimized.jar
+# export JS_XCALL=$HOME/blockchain/projects/scripts/ibc-relay/artifacts/xcall.jar
+export JS_XCALL=$XCALL_MULTI/contracts/javascore/xcall/build/libs/xcall-0.1.0-optimized.jar
 export JS_CENTRALIZED_CONNECTION=$XCALL_MULTI/contracts/javascore/centralized-connection/build/libs/centralized-connection-0.1.0-optimized.jar
 
 ---------------------------------------------------------------------------------

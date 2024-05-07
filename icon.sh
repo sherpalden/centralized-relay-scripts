@@ -31,7 +31,6 @@ function icon_wait_tx() {
     fi
 }
 
-
 function save_address() {
     log_stack
     local ret=1
@@ -98,6 +97,27 @@ function send_message() {
     icon_wait_tx "$tx_hash"
 }
 
+function send_message_sui() {
+    dest_chain=SUI
+    dst_network_id=sui
+    dst_dapp_address=$(cat $(getPath $dest_chain .dappCapId))
+
+    src_connection_address=$(cat $(getPath ICON .centralizedConnection))
+    dst_connection_address=centralized
+
+    src_xcall_address=$(cat $(getPath ICON .xcall))
+
+    param="{\"params\":{\"_to\":\"$dst_network_id/$dst_dapp_address\",\"_data\":\"0x90\",\"_sources\":[\"$src_connection_address\"],\"_destinations\":[\"$dst_connection_address\"]}}"
+	
+    tx_hash=$(goloop rpc sendtx call \
+	    --to $src_xcall_address \
+	    --method sendCallMessage \
+	    --raw $param \
+        $ICON_COMMON_ARGS | jq -r .) || handle_error "failed to send message from icon to $dest_chain"
+
+    icon_wait_tx "$tx_hash"
+}
+
 function start_node() {
 	cd $ICON_CHAIN_PATH
 	make ibc-ready
@@ -130,6 +150,9 @@ case "$1" in
     ;;
 	send_message)
 		send_message $2
+	;;
+    send_message_sui)
+		send_message_sui
 	;;
     *)
         echo "Error: unknown action $1"

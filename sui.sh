@@ -3,9 +3,9 @@
 source const.sh
 source utils.sh
 
-SUI_GAS_BUDGET=50000000
+SUI_GAS_BUDGET=500000000
 
-GAS_COIN_ID=0x3789f3310cd2c556dedd2487d620debc640756cdb36e86dc9ab8d672f85487fd
+GAS_COIN_ID=0x9faf6fc63c2ce7dbb77c17d8451105e0bf10a0e3c0f133d568620b08d1ff3905
 GAS_COIN_ID_1=0xdef77b35bb80e3b60465ce919dec3bef53d16bda76c65d9a1ffd120b3affd35e
 
 XCALL_PATH=$PWD/repos/xcall-multi/contracts/sui/xcall
@@ -49,7 +49,7 @@ function deploy_xcall() {
 
     sui move build --path $XCALL_PATH
 
-    result=$(sui client publish --gas-budget $SUI_GAS_BUDGET $XCALL_PATH --json) || handle_error "failed to publish package rlp"
+    result=$(sui client publish --gas-budget $SUI_GAS_BUDGET $XCALL_PATH --json)
     echo "Result: $result"
     package_id=$(echo $result | jq -r '.objectChanges[] | select(.type == "published") | .packageId')
 
@@ -91,21 +91,23 @@ function deploy_dapp() {
     update_file $file_path addresses.mock_dapp $package_id
 
     log "dapp package id : $package_id"
-    log "dapp WitnessCarrier id : $package_id"
+    log "dapp WitnessCarrier id : $witness_carrier"
 }
 
 function register_connection() {
     xcall_pkg_id=$(cat $(getPath SUI .xcall))
     xcall_storage=$(cat $(getPath SUI .xcallStorage))
     xcall_admin_cap=$(cat $(getPath SUI .xcallAdminCap))
-    echo $(sui client call \
+    tx="sui client call \
         --package $xcall_pkg_id \
         --module main \
         --function register_connection \
         --args $xcall_storage $xcall_admin_cap sui centralized \
         --gas $GAS_COIN_ID \
         --gas-budget $SUI_GAS_BUDGET \
-        --json)
+        --json"
+    echo "executing: $tx"
+    echo $($tx)
 }
 
 function register_xcall() {
@@ -119,13 +121,20 @@ function register_xcall() {
         --args $xcall_storage $dapp_witness_carrier \
         --gas $GAS_COIN_ID \
         --gas-budget $SUI_GAS_BUDGET \
-        --json) || handle_error "failed to register xcall on dapp"
+        --json)
+    
+    echo "result: $result"
 
     object_type="${dapp_pkg_id}::dapp_state::DappState"
     dapp_state=$(echo "$result" | jq -r --arg object_type "$object_type" '.objectChanges[] | select(.objectType == $object_type) | .objectId') 
 
+    dapp_state_object=$(sui client object $dapp_state --json)
+    dapp_cap_id=$(echo "$dapp_state_object" | jq -r '.content.fields.xcall_cap.fields.id.id')
+
+    echo $dapp_cap_id > $(getPath SUI .dappCapId)  
     echo $dapp_state > $(getPath SUI .dappState)  
     log "parsed dapp state : $dapp_state"
+    log "parsed dapp cap id : $dapp_cap_id"
 }
 
 function add_connection() {
@@ -162,9 +171,38 @@ function send_message() {
         --json)
 }
 
+function setup_sui() {
+    deploy_rlp
+
+    sleep 3 
+
+    deploy_xcall
+
+    sleep 3
+
+    deploy_dapp 
+
+    sleep 3
+
+    register_connection
+
+    sleep 3
+
+    register_xcall
+
+
+    sleep 3
+
+    add_connection ICON
+}
+
+
 case "$1" in
     init)
         init
+    ;;
+    setup)
+        setup_sui
     ;;
 	deploy)
         case "$2" in
