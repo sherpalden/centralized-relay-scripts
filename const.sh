@@ -68,6 +68,7 @@ export SUI_NODE_WS_URI=ws://fullnode.testnet.sui.io:443
 # export SUI_NODE_WS_URI=ws://localhost:9000
 export SUI_CHAIN_ID=sui
 export SUI_RELAYER_ADDRESS=0x07304a5d7d1a4763a1cea91f478d24e40aecf1fdbd2f14764d5ad745f4904f85
+# export SUI_RELAYER_ADDRESS=0x16bd930fdaa0d3d26bda5f49800fd41f1b40f0cea80c9884c806d79f97ce723f
 
 
 ##############################    ICON    ###################################

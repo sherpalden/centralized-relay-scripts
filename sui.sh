@@ -5,8 +5,8 @@ source utils.sh
 
 SUI_GAS_BUDGET=500000000
 
-GAS_COIN_ID=0x9faf6fc63c2ce7dbb77c17d8451105e0bf10a0e3c0f133d568620b08d1ff3905
-GAS_COIN_ID_1=0xdef77b35bb80e3b60465ce919dec3bef53d16bda76c65d9a1ffd120b3affd35e
+GAS_COIN_ID=0x275e8f3232843eb861e429b11b2d694c07638c527dc92a799234d646fc165027
+GAS_COIN_ID_1=0xca3e163c3e3b1bb44e706a2d621bc2bef194f74de58dd3aa3ba20f1a3334f041
 
 XCALL_PATH=$PWD/repos/xcall-multi/contracts/sui/xcall
 RLP_PATH=$PWD/repos/xcall-multi/contracts/sui/libs/sui_rlp
@@ -165,7 +165,7 @@ function send_message() {
         --package $dapp_pkg_id \
         --module mock_dapp \
         --function send_message \
-        --args $dapp_state $xcall_storage $GAS_COIN_ID_1 0x3.icon/abc '[104,101,108,108,111]' \
+        --args $dapp_state $xcall_storage $GAS_COIN_ID_1 0x3.icon/hxb6b5791be0b5ef67063b3c10b840fb81514db2fd '[104,101,108,108,111]' \
         --gas $GAS_COIN_ID \
         --gas-budget $SUI_GAS_BUDGET \
         --json)
