@@ -75,6 +75,32 @@ function deploy_centralized_connection() {
     deploy_contract $JS_CENTRALIZED_CONNECTION $(getPath ICON .centralizedConnection) _xCall=$xcall_addr _relayer=$relayer_addr
 }
 
+function deploy_dapp() {
+    local xcall_addr=$(cat $(getPath ICON .xcall))
+
+    deploy_contract $JS_DAPP $(getPath ICON .dapp) _callService=$xcall_addr
+}
+
+function add_connection() {
+    dest_chain=$1
+    dst_network_id=$(get ${dest_chain}_NETWORK_ID)
+    src_conn_addr=$(cat $(getPath ICON .centralizedConnection))
+    dst_conn_addr=centralized
+
+    dapp_addr=$(cat $(getPath ICON .dapp))
+
+    local param="{\"params\":{\"nid\":\"$dst_network_id\",\"source\":\"$src_conn_addr\",\"destination\":\"centralized\"}}"
+	
+    local tx_hash=$(goloop rpc sendtx call \
+	    --to $dapp_addr \
+	    --method addConnection \
+	    --raw $param \
+        $ICON_COMMON_ARGS | jq -r .) || handle_error "failed to add connection"
+
+    icon_wait_tx "$tx_hash"
+}
+
+
 function send_message() {
     local dest_chain=$1
 
@@ -118,6 +144,24 @@ function send_message_sui() {
     icon_wait_tx "$tx_hash"
 }
 
+function send_message_sui_dapp() {
+    dest_chain=SUI
+    dst_network_id=sui
+    dst_dapp_address=$(cat $(getPath $dest_chain .dappCapId))
+
+    src_dapp_addr=$(cat $(getPath ICON .dapp))
+
+    param="{\"params\":{\"_to\":\"$dst_network_id/$dst_dapp_address\",\"_data\":\"0x90\"}}"
+	
+    tx_hash=$(goloop rpc sendtx call \
+	    --to $src_dapp_addr \
+	    --method sendMessage \
+	    --raw $param \
+        $ICON_COMMON_ARGS | jq -r .) || handle_error "failed to send message from icon dapp to $dest_chain"
+
+    icon_wait_tx "$tx_hash"
+}
+
 function start_node() {
 	cd $ICON_CHAIN_PATH
 	make ibc-ready
@@ -143,16 +187,25 @@ case "$1" in
 			connection)
                 deploy_centralized_connection
             ;;
+            dapp)
+                deploy_dapp
+            ;;
             *)
 				echo "Error: unknown contract $2"
 			;;
         esac
+    ;;
+    add_connection)
+        add_connection $2
     ;;
 	send_message)
 		send_message $2
 	;;
     send_message_sui)
 		send_message_sui
+	;;
+    send_message_sui_dapp)
+		send_message_sui_dapp
 	;;
     *)
         echo "Error: unknown action $1"

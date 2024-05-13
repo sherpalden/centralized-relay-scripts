@@ -137,6 +137,24 @@ function send_message() {
 	execute_contract $src_chain $src_xcall_address $call_params
 }
 
+function send_message_sui() {
+    local src_chain=$1
+    local dest_chain=SUI
+
+    local dst_network_id=sui
+	local dst_dapp_address=$(cat $(getPath $dest_chain .dappCapId))
+
+    local src_connection_address=$(cat $(getPath $src_chain .centralizedConnection))
+    local dst_connection_address=centralized
+
+    local src_xcall_address=$(cat $(getPath $src_chain .xcall))
+
+	local call_params="{\"send_call_message\":{\"to\":\"$dst_network_id/$dst_dapp_address\",\"data\":[1,2,3,4,5],\"sources\":[\"$src_connection_address\"],\"destinations\":[\"$dst_connection_address\"]}}"
+
+	echo "call params: $call_params"
+	execute_contract $src_chain $src_xcall_address $call_params
+}
+
 
 function start_node_archway() {
 	cd $ARCHWAY_CHAIN_PATH
@@ -184,6 +202,9 @@ case "$1" in
     ;;
 	send_message)
 		send_message $2 $3
+	;;
+	send_message_sui)
+		send_message_sui $2
 	;;
     *)
         echo "Error: unknown action $1"

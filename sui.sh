@@ -5,8 +5,8 @@ source utils.sh
 
 SUI_GAS_BUDGET=500000000
 
-GAS_COIN_ID=0x275e8f3232843eb861e429b11b2d694c07638c527dc92a799234d646fc165027
-GAS_COIN_ID_1=0xca3e163c3e3b1bb44e706a2d621bc2bef194f74de58dd3aa3ba20f1a3334f041
+GAS_COIN_ID=0x07014643f449020590081e9576ed1ba82ef64d046f8617ce4d6a37dc8017240d
+GAS_COIN_ID_1=0x72c19156750bd84fae10c7695b6fc907a6acc664693532930d5b61679f569178
 
 XCALL_PATH=$PWD/repos/xcall-multi/contracts/sui/xcall
 RLP_PATH=$PWD/repos/xcall-multi/contracts/sui/libs/sui_rlp
@@ -171,6 +171,20 @@ function send_message() {
         --json)
 }
 
+function send_message_archway() {
+    dapp_pkg_id=$(cat $(getPath SUI .dapp))
+    xcall_storage=$(cat $(getPath SUI .xcallStorage))
+    dapp_state=$(cat $(getPath SUI .dappState))
+    echo $(sui client call \
+        --package $dapp_pkg_id \
+        --module mock_dapp \
+        --function send_message \
+        --args $dapp_state $xcall_storage $GAS_COIN_ID_1 archway/archway1rl233ncc2tgmz709tnfk5x2lfe5uu9wv0c9vrp '[104,101,108,108,111]' \
+        --gas $GAS_COIN_ID \
+        --gas-budget $SUI_GAS_BUDGET \
+        --json)
+}
+
 function setup_sui() {
     deploy_rlp
 
@@ -238,6 +252,9 @@ case "$1" in
 	;;
     send_message)
 		send_message $2
+	;;
+    send_message_archway)
+		send_message_archway
 	;;
     *)
         echo "Error: unknown action $1"

@@ -62,8 +62,9 @@ export ARCHWAY_COMMON_ARGS=" --from ${WASM_GENESIS_KEY} --keyring-backend $WASM_
 export ARCHWAY_COMMON_ARGS_V1=" --keyring-backend $WASM_KEYRING_BACKEND --node ${ARCHWAY_NODE_URI} --chain-id ${ARCHWAY_CHAIN_ID} --gas-prices ${ARCHWAY_GAS_PRICE}${ARCHWAY_DENOM} --gas auto --gas-adjustment 1.5 "
 	
 ##############################    SUI    ###################################
-export SUI_NODE_URI=https://fullnode.testnet.sui.io:443
-export SUI_NODE_WS_URI=ws://fullnode.testnet.sui.io:443
+export SUI_NODE_URI=https://fullnode.devnet.sui.io:443
+export SUI_NODE_WS_URI=ws://fullnode.devnet.sui.io:443
+export SUI_NETWORK_ID=sui
 # export SUI_NODE_URI=http://localhost:9000
 # export SUI_NODE_WS_URI=ws://localhost:9000
 export SUI_CHAIN_ID=sui
@@ -101,6 +102,7 @@ export CW_CENTRALIZED_CONNECTION=$PWD/artifacts/cw_centralized_connection.wasm
 export JS_XCALL=$XCALL_MULTI/contracts/javascore/xcall/build/libs/xcall-0.1.0-optimized.jar
 export JS_CENTRALIZED_CONNECTION=$XCALL_MULTI/contracts/javascore/centralized-connection/build/libs/centralized-connection-0.1.0-optimized.jar
 
+export JS_DAPP=/Users/sherpalden/blockchain/projects/xcall-multi/contracts/javascore/example-dapps/dapp-multi-protocol/build/libs/dapp-multi-protocol-0.1.0-optimized.jar
 ---------------------------------------------------------------------------------
 export SUI_PKG_RLP=/Users/sherpalden/blockchain/projects/xcall-multi/contracts/sui/libs/sui_rlp/build/sui_rlp/bytecode_modules
 
