@@ -97,31 +97,42 @@ chains:
       nid: $ICON_NETWORK_ID
       step-min: 1
       step-limit: 100000000000
-  archway:
-    type: cosmos
-    value:
-      chain-id: $ARCHWAY_CHAIN_ID
-      nid: $ARCHWAY_NETWORK_ID
-      rpc-url: $ARCHWAY_NODE_URI
-      grpc-url: $ARCHWAY_NODE_GRPC_URI
-      keyring-backend: memory
-      address: $archway_relayer
-      account-prefix: $ARCHWAY_PREFIX
-      start-height: 0
-      contracts:
-        xcall: $archway_xcall_address
-        connection: $archway_connection_address
-      denomination: $ARCHWAY_DENOM
-      gas-prices: $ARCHWAY_GAS_PRICE$ARCHWAY_DENOM
-      gas-adjustment: 1.5
-      max-gas-amount: 4000000
-      min-gas-amount: 20000
-      block-interval: 6s
-      tx-confirmation-interval: 5s
-      broadcast-mode: sync
-      sign-mode: SIGN_MODE_DIRECT
-      simulate: true
-      finality-block: 0
+
+  # solana:
+  #   type: solana
+  #   value:
+  #     rpc-url: http://localhost:8899
+  #     start-height: 0
+  #     address: CAjoEVBfYGeKY9bpLbYz2ycYazk9vuWcVgcQ29tNLKuX
+  #     xcall-address: DBoyUjxTeL73UYBZrZiHaiS36RehDmuHKWkmCaJAgZpG
+  #     connection-address: DBoyUjxTeL73UYBZrZiHaiS36RehDmuHKWkmCaJAgZpG
+  #     nid: solana
+  #     gas-limit: 1000
+  # archway:
+  #   type: cosmos
+  #   value:
+  #     chain-id: $ARCHWAY_CHAIN_ID
+  #     nid: $ARCHWAY_NETWORK_ID
+  #     rpc-url: $ARCHWAY_NODE_URI
+  #     grpc-url: $ARCHWAY_NODE_GRPC_URI
+  #     keyring-backend: memory
+  #     address: $archway_relayer
+  #     account-prefix: $ARCHWAY_PREFIX
+  #     start-height: 0
+  #     contracts:
+  #       xcall: $archway_xcall_address
+  #       connection: $archway_connection_address
+  #     denomination: $ARCHWAY_DENOM
+  #     gas-prices: $ARCHWAY_GAS_PRICE$ARCHWAY_DENOM
+  #     gas-adjustment: 1.5
+  #     max-gas-amount: 4000000
+  #     min-gas-amount: 20000
+  #     block-interval: 6s
+  #     tx-confirmation-interval: 5s
+  #     broadcast-mode: sync
+  #     sign-mode: SIGN_MODE_DIRECT
+  #     simulate: true
+  #     finality-block: 0
 EOF
 
 log "relay config updated!"

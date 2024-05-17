@@ -100,6 +100,19 @@ function add_connection() {
     icon_wait_tx "$tx_hash"
 }
 
+function setup() {
+    dest_chain=$1
+    deploy_xcall
+    sleep 3
+
+    deploy_centralized_connection
+    sleep 3
+
+    deploy_dapp
+    sleep 3
+
+    add_connection $dest_chain
+}
 
 function send_message() {
     local dest_chain=$1
@@ -123,35 +136,20 @@ function send_message() {
     icon_wait_tx "$tx_hash"
 }
 
-function send_message_sui() {
-    dest_chain=SUI
-    dst_network_id=sui
-    dst_dapp_address=$(cat $(getPath $dest_chain .dappCapId))
-
-    src_connection_address=$(cat $(getPath ICON .centralizedConnection))
-    dst_connection_address=centralized
-
-    src_xcall_address=$(cat $(getPath ICON .xcall))
-
-    param="{\"params\":{\"_to\":\"$dst_network_id/$dst_dapp_address\",\"_data\":\"0x90\",\"_sources\":[\"$src_connection_address\"],\"_destinations\":[\"$dst_connection_address\"]}}"
-	
-    tx_hash=$(goloop rpc sendtx call \
-	    --to $src_xcall_address \
-	    --method sendCallMessage \
-	    --raw $param \
-        $ICON_COMMON_ARGS | jq -r .) || handle_error "failed to send message from icon to $dest_chain"
-
-    icon_wait_tx "$tx_hash"
-}
-
 function send_message_sui_dapp() {
     dest_chain=SUI
     dst_network_id=sui
+    # dst_dapp_address=$(cat $(getPath $dest_chain .mockDappCapId))
     dst_dapp_address=$(cat $(getPath $dest_chain .dappCapId))
 
     src_dapp_addr=$(cat $(getPath ICON .dapp))
 
-    param="{\"params\":{\"_to\":\"$dst_network_id/$dst_dapp_address\",\"_data\":\"0x90\"}}"
+    reply_res=0x7265706c792d726573706f6e7365
+    rollback=0x726f6c6c6261636b
+
+    msg=$reply_res
+
+    param="{\"params\":{\"_to\":\"$dst_network_id/$dst_dapp_address\",\"_data\":\"$msg\",\"_rollback\":\"0x68656c6c6f\"}}"
 	
     tx_hash=$(goloop rpc sendtx call \
 	    --to $src_dapp_addr \
@@ -179,6 +177,9 @@ case "$1" in
 	stop_node)
 		stop_node
 	;;
+    setup)
+        setup $2
+    ;;
 	deploy)
         case "$2" in
             xcall)
