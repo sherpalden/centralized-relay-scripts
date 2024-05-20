@@ -326,3 +326,12 @@
 04:45:50.511627 version@stat F·[3 2] S·8KiB[2KiB 5KiB] Sc·[0.75 0.00]
 04:45:50.524304 db@janitor F·7 G·0
 04:45:50.525339 db@open done T·18.134958ms
+=============== May 20, 2024 (UTC) ===============
+04:25:27.368961 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+04:25:27.374766 version@stat F·[3 2] S·8KiB[2KiB 5KiB] Sc·[0.75 0.00]
+04:25:27.375244 db@open opening
+04:25:27.375714 journal@recovery F·1
+04:25:27.376449 journal@recovery recovering @90
+04:25:27.379406 version@stat F·[3 2] S·8KiB[2KiB 5KiB] Sc·[0.75 0.00]
+04:25:27.391691 db@janitor F·7 G·0
+04:25:27.392083 db@open done T·16.463917ms

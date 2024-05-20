@@ -146,8 +146,9 @@ function send_message_sui_dapp() {
 
     reply_res=0x7265706c792d726573706f6e7365
     rollback=0x726f6c6c6261636b
+    hello=0x68692068656c6c6f
 
-    msg=$reply_res
+    msg=$hello
 
     param="{\"params\":{\"_to\":\"$dst_network_id/$dst_dapp_address\",\"_data\":\"$msg\",\"_rollback\":\"0x68656c6c6f\"}}"
 	

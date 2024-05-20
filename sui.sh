@@ -135,12 +135,15 @@ function configure_balanced() {
     dest_nid=$(get ${dest_chain}_NETWORK_ID)
     dest_connection_addr=$(cat $(getPath $dest_chain .centralizedConnection))
 
+    dest_dapp_addr=$(cat $(getPath $dest_chain .dapp))
+
+
     dapp_pkg_id=$(cat $(getPath SUI .dapp))
 
     dapp_admin_cap=$(cat $(getPath SUI .dappAdminCap))
     xcall_state=$(cat $(getPath SUI .xcallStorage))
     dapp_witness_carrier=$(cat $(getPath SUI .dappWitnessCarrier))
-    icon_governance=cxdb3d3e2717d4896b336874015a4b23871e62fb6b
+    icon_governance=$dest_dapp_addr
     sources=["centralized"]
     destinations=["$dest_connection_addr"]
 
