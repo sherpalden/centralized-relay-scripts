@@ -139,8 +139,8 @@ function send_message() {
 function send_message_sui_dapp() {
     dest_chain=SUI
     dst_network_id=sui
-    # dst_dapp_address=$(cat $(getPath $dest_chain .mockDappCapId))
-    dst_dapp_address=$(cat $(getPath $dest_chain .dappCapId))
+    dst_dapp_address=$(cat $(getPath $dest_chain .mockDappCapId))
+    # dst_dapp_address=$(cat $(getPath $dest_chain .dappCapId))
 
     src_dapp_addr=$(cat $(getPath ICON .dapp))
 

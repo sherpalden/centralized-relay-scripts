@@ -8,10 +8,11 @@ RELAY_CFG_BACKUP_FILE=$HOME/.centralized-relay/config_backup.yaml
 
 
 sui_xcall_address=$(cat $(getPath SUI .xcall)) || handle_error "failed to get sui xcall address"
-sui_dapp_address=$(cat $(getPath SUI .dapp)) || handle_error "failed to get sui dapp address"
+sui_dapp_address=$(cat $(getPath SUI .mockDapp)) || handle_error "failed to get sui dapp address"
 
 sui_xcall_storage_id=$(cat $(getPath SUI .xcallStorage)) || handle_error "failed to get sui xcall storage address"
-sui_dapp_state_id=$(cat $(getPath SUI .dappState)) || handle_error "failed to get sui dapp state address"
+sui_dapp_state_id=$(cat $(getPath SUI .mockDappState)) || handle_error "failed to get sui dapp state address"
+sui_dapp_cap_id=$(cat $(getPath SUI .mockDappCapId)) || handle_error "failed to get sui dapp cap id"
 
 icon_xcall_address=$(cat $(getPath ICON .xcall)) || handle_error "failed to get icon xcall address"
 avalanche_xcall_address=$(cat $(getPath AVALANCHE .xcall)) || handle_error "failed to get avalanche xcall address"
@@ -40,14 +41,18 @@ chains:
       chain-id: sui
       nid: sui
       rpc-url: $SUI_NODE_URI
-      ws-url: $SUI_NODE_WS_URI
       address: $SUI_RELAYER_ADDRESS
       xcall-package-id: $sui_xcall_address
-      dapp-package-id: $sui_dapp_address
       xcall-storage-id: $sui_xcall_storage_id
-      dapp-state-id: $sui_dapp_state_id
+
+      dapp-package-id: $sui_dapp_address
+      dapp-treasury-cap-carrier: $SUI_DAPP_TREASURY_CAP_CARRIER
+      dapp-modules:
+        - name: mock_dapp
+          cap-id: $sui_dapp_cap_id
+          config-id: $sui_dapp_state_id
+
       gas-limit: 5000000
-      gas-min: 5000000
 
   # avalanche:
   #   type: evm
@@ -103,10 +108,10 @@ chains:
   #   value:
   #     rpc-url: http://localhost:8899
   #     start-height: 0
-  #     address: CAjoEVBfYGeKY9bpLbYz2ycYazk9vuWcVgcQ29tNLKuX
-  #     xcall-address: DBoyUjxTeL73UYBZrZiHaiS36RehDmuHKWkmCaJAgZpG
-  #     connection-address: DBoyUjxTeL73UYBZrZiHaiS36RehDmuHKWkmCaJAgZpG
-  #     nid: solana
+  #     address: 7GoW5ACKgsKcjWKnfPXeGyZHMSNBJkqHFwjt5ex2i73z
+  #     xcall-state-account: 98jWod7uQK1kzfT3APyQ6DrDeQT8Hmu3PNm5n4T4ttoG
+  #     xcall-idl: 3fFhJNrxpdnKcxsY9sem81bg3VPQL5FySwzg99354spR
+  #     nid: solana 
   #     gas-limit: 1000
   # archway:
   #   type: cosmos

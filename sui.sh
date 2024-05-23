@@ -5,14 +5,15 @@ source utils.sh
 
 SUI_GAS_BUDGET=500000000
 
-GAS_COIN_ID=0xc0ff93f769aafe748284269cd41422c2169553b8f4d18081c780fc1cfcbbee88
-GAS_COIN_ID_1=0xf04ede87796f7ec121d31544bf8ff32f818b424b725795d411544e1846c14bd0
+GAS_COIN_ID=0xba311cc48a4f5b1e15cc7ac91da4303ab3856122660e6a7db6b44296923d3c51
+GAS_COIN_ID_1=0x6366bc7935fe392b8988e848328bc9cdc9a496c46dfd2a6e9c927b75fd1228f9
 
 XCALL_PATH=$PWD/repos/xcall-multi/contracts/sui/xcall
 RLP_PATH=$PWD/repos/xcall-multi/contracts/sui/libs/sui_rlp
 MOCK_DAPP_PATH=$PWD/repos/xcall-multi/contracts/sui/mock_dapp
 
 BALACNED_PATH=$PWD/repos/balanced-move-contracts
+
 
 function init() {
     cd ./repos
@@ -175,6 +176,23 @@ function configure_balanced() {
     log "parsed dapp cap id : $dapp_cap_id"
 }
 
+
+function configure_nid() {
+    xcall_pkg_id=$(cat $(getPath SUI .xcall))
+    xcall_storage=$(cat $(getPath SUI .xcallStorage))
+    xcall_admin_cap=$(cat $(getPath SUI .xcallAdminCap))
+    tx="sui client call \
+        --package $xcall_pkg_id \
+        --module main \
+        --function configure_nid \
+        --args $xcall_storage $xcall_admin_cap $SUI_NETWORK_ID \
+        --gas $GAS_COIN_ID \
+        --gas-budget $SUI_GAS_BUDGET \
+        --json"
+    echo "executing: $tx"
+    echo $($tx)
+}
+
 function register_connection() {
     xcall_pkg_id=$(cat $(getPath SUI .xcall))
     xcall_storage=$(cat $(getPath SUI .xcallStorage))
@@ -251,12 +269,10 @@ function send_message() {
 
     dest_id=$dest_nid/$dest_dapp
 
-    # msg=$(str_to_hex MessageTransferTestingWithoutRollback)
     # msg=0x68656c6c6f207468657265
     msg=0x7265706c792d726573706f6e7365
     # msg=0x4d6f73742070656f706c65206172652066616d696c69617220776974682074686520646563696d616c2c206f7220626173652d31302c2073797374656d206f66206e756d626572732028616c6c20706f737369626c65206e756d626572732063616e206265206e6f7461746564207573696e6720746865203130206469676974732c20302c312c322c332c342c352c362c372c382c39292e2057697468206f6e6c79203130206469676974732c20657874726120646967697473206e65656420746f2062652075736564206174206365727461696e20696e74657276616c7320746f20636f72726563746c79206e6f746174652061206e756d6265722e20466f72206578616d706c652c20746865206e756d626572203432332c3030342075736573207477696365206173206d7563682064696769747320617320746865206e756d626572203936312e0d0a0d0a
 
-    # rollback_msg=$(str_to_hex "no")
 
     tx="sui client call \
         --package $dapp_pkg_id \
@@ -268,20 +284,6 @@ function send_message() {
         --json"
     echo "executing: $tx"
     echo $($tx)
-}
-
-function send_message_archway() {
-    dapp_pkg_id=$(cat $(getPath SUI .mockDapp))
-    xcall_storage=$(cat $(getPath SUI .xcallStorage))
-    dapp_state=$(cat $(getPath SUI .mockDappState))
-    echo $(sui client call \
-        --package $dapp_pkg_id \
-        --module mock_dapp \
-        --function send_message \
-        --args $dapp_state $xcall_storage $GAS_COIN_ID_1 archway/archway1rl233ncc2tgmz709tnfk5x2lfe5uu9wv0c9vrp '[104,101,108,108,111]' '[]' \
-        --gas $GAS_COIN_ID \
-        --gas-budget $SUI_GAS_BUDGET \
-        --json)
 }
 
 function setup_sui_balanced() {
@@ -307,6 +309,9 @@ function setup_sui_mock_dapp() {
     deploy_xcall
     sleep 3
 
+    configure_nid
+    sleep 3
+
     register_connection
     sleep 3
 
@@ -328,7 +333,7 @@ case "$1" in
         configure_balanced $2
     ;;
     setup)
-        setup_sui_balanced
+        setup_sui_mock_dapp
     ;;
 	deploy)
         case "$2" in
@@ -367,9 +372,6 @@ case "$1" in
 	;;
     send_message)
 		send_message $2
-	;;
-    send_message_archway)
-		send_message_archway
 	;;
     *)
         echo "Error: unknown action $1"
